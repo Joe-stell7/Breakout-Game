@@ -96,33 +96,53 @@ public class BreakoutModel {
     public void initializeBricks() {
         bricks = new Brick[BRICK_ROWS][BRICK_COLS];
 
-        int startX = 0;
-        int startY = TOP_HUD_HEIGHT + 20;
-
         for (int row = 0; row < BRICK_ROWS; row++) {
-            Color color;
-            int points;
-
-            if (row <= 1) {
-                color = Color.RED;
-                points = 7;
-            } else if (row <= 3) {
-                color = Color.ORANGE;
-                points = 5;
-            } else if (row <= 5) {
-                color = Color.GREEN;
-                points = 3;
-            } else {
-                color = Color.BLUE;
-                points = 1;
-            }
-
             for (int col = 0; col < BRICK_COLS; col++) {
-                int x = startX + col * (BRICK_WIDTH + BRICK_GAP);
-                int y = startY + row * (BRICK_HEIGHT + BRICK_GAP);
-
-                bricks[row][col] = new Brick(x, y, BRICK_WIDTH, BRICK_HEIGHT, color, points);
+                bricks[row][col] = createBrick(row, col);
             }
+        }
+    }
+
+    private Brick createBrick(int row, int col) {
+        int x = getBrickX(col);
+        int y = getBrickY(row);
+        Color color = getBrickColor(row);
+        int points = getBrickPointValue(row);
+
+        return new Brick(x, y, BRICK_WIDTH, BRICK_HEIGHT, color, points);
+    }
+
+    private int getBrickX(int col) {
+        int startX = 0;
+        return startX + col * (BRICK_WIDTH + BRICK_GAP);
+    }
+
+    private int getBrickY(int row) {
+        int startY = TOP_HUD_HEIGHT + 20;
+        return startY + row * (BRICK_HEIGHT + BRICK_GAP);
+    }
+
+    private Color getBrickColor(int row) {
+        if (row <= 1) {
+            return Color.RED;
+        } else if (row <= 3) {
+            return Color.ORANGE;
+        } else if (row <= 5) {
+            return Color.GREEN;
+        } else {
+            return Color.BLUE;
+        }
+    }
+
+    private int getBrickPointValue(int row) {
+        if (row <= 1) {
+            return 7;
+        } else if (row <= 3) {
+            return 5;
+        } else if (row <= 5) {
+            return 3;
+        } else {
+            return 1;
         }
     }
 

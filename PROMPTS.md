@@ -105,3 +105,50 @@ I ran the game, saw that the layout still had unused space on the sides, and rea
 
 What was wrong and how I corrected it:
 The AI’s first brick values were close but not exact, so the grid still left gaps on the sides. I corrected this by adjusting the brick dimensions and starting position in the model until the grid reached the boundaries, which fixed both the drawn layout and the collision alignment.
+
+Prompt 6 — The refactor prompt
+
+Prompt:
+In BreakoutModel.java, refactor the initializeBricks() method by moving the brick rectangle creation logic into a new private helper method named createBrick(int row, int col). Keep the existing brick layout, colors, scoring behavior, and collision behavior the same. Do not modify BreakoutView.java, BreakoutController.java, or Main.java. Show me the full updated BreakoutModel.java only. Do not change game behavior — this is a pure refactor.
+
+What the AI produced:
+The AI returned the updated BreakoutModel.java with a new private createBrick(int row, int col) helper method and a cleaned-up initializeBricks() method that now calls that helper.
+
+What I changed and why:
+I updated BreakoutModel.java to use the helper method so the brick creation code is easier to read and maintain without changing gameplay behavior.
+
+Prompt 7- 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Prompt 10- A test-extension prompt for ModelTester
