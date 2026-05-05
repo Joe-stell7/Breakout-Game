@@ -82,9 +82,9 @@ public class BreakoutModel {
         ballDX = 0;
         ballDY = -BALL_SPEED;
 
-        secondBall = new Rectangle(0, 0, BALL_SIZE, BALL_SIZE);
+        secondBall = new Rectangle(-100, -100, BALL_SIZE, BALL_SIZE);
         secondBallDX = 0;
-        secondBallDY = -BALL_SPEED;
+        secondBallDY = 0;
 
         initializeBricks();
     }
@@ -94,15 +94,14 @@ public class BreakoutModel {
         paddle.y = WINDOW_HEIGHT - 80;
 
         attachBallToPaddle();
-
         ballDX = 0;
         ballDY = -BALL_SPEED;
 
-        if (secondBallActive) {
-            attachSecondBallToPaddle();
-            secondBallDX = 0;
-            secondBallDY = -BALL_SPEED;
-        }
+        secondBallActive = false;
+        secondBall.x = -100;
+        secondBall.y = -100;
+        secondBallDX = 0;
+        secondBallDY = 0;
 
         gameState = GameState.WAITING;
     }
@@ -110,11 +109,6 @@ public class BreakoutModel {
     public void attachBallToPaddle() {
         ball.x = paddle.x + (paddle.width / 2) - (BALL_SIZE / 2);
         ball.y = paddle.y - BALL_SIZE;
-    }
-
-    public void attachSecondBallToPaddle() {
-        secondBall.x = paddle.x + (paddle.width / 2) - (BALL_SIZE / 2) + 30;
-        secondBall.y = paddle.y - BALL_SIZE - 20;
     }
 
     public void initializeBricks() {
@@ -180,7 +174,7 @@ public class BreakoutModel {
             secondBall.x = ball.x + 20;
             secondBall.y = ball.y + 20;
 
-            secondBallDX = 0;
+            secondBallDX = BALL_SPEED;
             secondBallDY = -BALL_SPEED;
         }
     }
@@ -199,6 +193,10 @@ public class BreakoutModel {
 
     public boolean isSecondBallActive() {
         return secondBallActive;
+    }
+
+    public void setSecondBallActive(boolean secondBallActive) {
+        this.secondBallActive = secondBallActive;
     }
 
     public boolean isLevelTwoUnlocked() {

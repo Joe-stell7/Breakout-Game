@@ -50,10 +50,6 @@ public class BreakoutController implements KeyListener, ActionListener {
         } else if (model.getGameState() == BreakoutModel.GameState.WAITING) {
             updatePaddle();
             model.attachBallToPaddle();
-
-            if (model.isSecondBallActive()) {
-                model.attachSecondBallToPaddle();
-            }
         }
 
         view.repaint();
@@ -93,17 +89,20 @@ public class BreakoutController implements KeyListener, ActionListener {
         }
 
         if (currentBall.y <= BreakoutModel.TOP_HUD_HEIGHT) {
-            currentBall.y = TOP_HUD_HEIGHT_FIX();
+            currentBall.y = BreakoutModel.TOP_HUD_HEIGHT;
             dy = Math.abs(dy);
         }
 
-        if (currentBall.intersects(model.getPaddle()) && dy > 0) {
-            Rectangle paddle = model.getPaddle();
-            currentBall.y = paddle.y - currentBall.height;
+        Rectangle paddle = model.getPaddle();
+
+        if (currentBall.intersects(paddle) && dy > 0) {
+            currentBall.y = paddle.y - currentBall.height - 1;
 
             int paddleCenter = paddle.x + paddle.width / 2;
             int ballCenter = currentBall.x + currentBall.width / 2;
-            double relativeIntersect = (double) (ballCenter - paddleCenter) / (paddle.width / 2.0);
+
+            double relativeIntersect =
+                    (double) (ballCenter - paddleCenter) / (paddle.width / 2.0);
 
             if (relativeIntersect < -1.0) {
                 relativeIntersect = -1.0;
@@ -113,6 +112,7 @@ public class BreakoutController implements KeyListener, ActionListener {
             }
 
             int speed = BreakoutModel.BALL_SPEED;
+
             dx = (int) Math.round(relativeIntersect * speed);
 
             if (dx == 0 && relativeIntersect != 0) {
@@ -133,35 +133,40 @@ public class BreakoutController implements KeyListener, ActionListener {
                     brick.destroyed = true;
                     model.addScore(brick.pointValue);
 
-                    if (dy > 0) {
-                        currentBall.y = brick.bounds.y - currentBall.height;
+                    int overlapLeft = (currentBall.x + currentBall.width) - brick.bounds.x;
+                    int overlapRight = (brick.bounds.x + brick.bounds.width) - currentBall.x;
+                    int overlapTop = (currentBall.y + currentBall.height) - brick.bounds.y;
+                    int overlapBottom = (brick.bounds.y + brick.bounds.height) - currentBall.y;
+
+                    int minOverlapX = Math.min(overlapLeft, overlapRight);
+                    int minOverlapY = Math.min(overlapTop, overlapBottom);
+
+                    if (minOverlapX < minOverlapY) {
+                        if (overlapLeft < overlapRight) {
+                            currentBall.x = brick.bounds.x - currentBall.width;
+                            dx = -Math.abs(dx);
+                        } else {
+                            currentBall.x = brick.bounds.x + brick.bounds.width;
+                            dx = Math.abs(dx);
+                        }
                     } else {
-                        currentBall.y = brick.bounds.y + brick.bounds.height;
+                        if (overlapTop < overlapBottom) {
+                            currentBall.y = brick.bounds.y - currentBall.height;
+                            dy = -Math.abs(dy);
+                        } else {
+                            currentBall.y = brick.bounds.y + brick.bounds.height;
+                            dy = Math.abs(dy);
+                        }
                     }
 
-                    dy = -dy;
                     brickHit = true;
                 }
             }
         }
 
         if (currentBall.y > BreakoutModel.WINDOW_HEIGHT) {
-            if (firstBall) {
-                model.loseLife();
-
-                if (model.getLives() <= 0) {
-                    model.setGameState(BreakoutModel.GameState.LOST);
-                } else {
-                    model.resetAfterLifeLost();
-                }
-                return;
-            } else {
-                currentBall.x = -100;
-                currentBall.y = -100;
-                model.setSecondBallDX(0);
-                model.setSecondBallDY(0);
-                return;
-            }
+            removeBall(firstBall);
+            return;
         }
 
         if (firstBall) {
@@ -173,8 +178,38 @@ public class BreakoutController implements KeyListener, ActionListener {
         }
     }
 
-    private int TOP_HUD_HEIGHT_FIX() {
-        return BreakoutModel.TOP_HUD_HEIGHT;
+    private void removeBall(boolean firstBall) {
+        if (firstBall) {
+            if (model.isSecondBallActive()) {
+                Rectangle mainBall = model.getBall();
+                Rectangle secondBall = model.getSecondBall();
+
+                mainBall.x = secondBall.x;
+                mainBall.y = secondBall.y;
+                model.setBallDX(model.getSecondBallDX());
+                model.setBallDY(model.getSecondBallDY());
+
+                secondBall.x = -100;
+                secondBall.y = -100;
+                model.setSecondBallDX(0);
+                model.setSecondBallDY(0);
+                model.setSecondBallActive(false);
+            } else {
+                model.loseLife();
+
+                if (model.getLives() <= 0) {
+                    model.setGameState(BreakoutModel.GameState.LOST);
+                } else {
+                    model.resetAfterLifeLost();
+                }
+            }
+        } else {
+            model.getSecondBall().x = -100;
+            model.getSecondBall().y = -100;
+            model.setSecondBallDX(0);
+            model.setSecondBallDY(0);
+            model.setSecondBallActive(false);
+        }
     }
 
     private void checkWin() {

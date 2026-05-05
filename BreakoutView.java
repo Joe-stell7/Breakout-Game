@@ -5,7 +5,7 @@ import java.awt.Font;
 import java.awt.Graphics;
 
 public class BreakoutView extends JPanel {
-    private BreakoutModel model;
+    private final BreakoutModel model;
 
     public BreakoutView(BreakoutModel model) {
         this.model = model;
