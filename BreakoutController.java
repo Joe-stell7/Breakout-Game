@@ -21,9 +21,9 @@ public class BreakoutController implements KeyListener, ActionListener {
 
         frame = new JFrame("Breakout");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(BreakoutModel.WINDOW_WIDTH, BreakoutModel.WINDOW_HEIGHT);
-        frame.add(view);
         frame.setResizable(false);
+        frame.add(view);
+        frame.pack();
 
         view.addKeyListener(this);
         view.setFocusable(true);
@@ -93,7 +93,7 @@ public class BreakoutController implements KeyListener, ActionListener {
         }
 
         if (currentBall.y <= BreakoutModel.TOP_HUD_HEIGHT) {
-            currentBall.y = BreakoutModel.TOP_HUD_HEIGHT;
+            currentBall.y = TOP_HUD_HEIGHT_FIX();
             dy = Math.abs(dy);
         }
 
@@ -112,17 +112,14 @@ public class BreakoutController implements KeyListener, ActionListener {
                 relativeIntersect = 1.0;
             }
 
-            dx = (int) Math.round(relativeIntersect * BreakoutModel.BALL_SPEED * 2);
+            int speed = BreakoutModel.BALL_SPEED;
+            dx = (int) Math.round(relativeIntersect * speed);
 
-            if (dx == 0) {
-                dx = 1;
+            if (dx == 0 && relativeIntersect != 0) {
+                dx = relativeIntersect < 0 ? -1 : 1;
             }
 
-            dy = -BreakoutModel.BALL_SPEED;
-
-            if (Math.abs(dx) >= Math.abs(dy)) {
-                dy = -Math.abs(dx) - 1;
-            }
+            dy = -Math.max(2, speed - Math.abs(dx));
         }
 
         BreakoutModel.Brick[][] bricks = model.getBricks();
@@ -174,6 +171,10 @@ public class BreakoutController implements KeyListener, ActionListener {
             model.setSecondBallDX(dx);
             model.setSecondBallDY(dy);
         }
+    }
+
+    private int TOP_HUD_HEIGHT_FIX() {
+        return BreakoutModel.TOP_HUD_HEIGHT;
     }
 
     private void checkWin() {

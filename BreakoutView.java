@@ -1,5 +1,6 @@
 import javax.swing.JPanel;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
 
@@ -10,6 +11,7 @@ public class BreakoutView extends JPanel {
         this.model = model;
         setBackground(Color.BLACK);
         setFocusable(true);
+        setPreferredSize(new Dimension(BreakoutModel.WINDOW_WIDTH, BreakoutModel.WINDOW_HEIGHT));
     }
 
     @Override
