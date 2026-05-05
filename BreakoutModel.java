@@ -79,11 +79,11 @@ public class BreakoutModel {
         ball = new Rectangle(0, 0, BALL_SIZE, BALL_SIZE);
         attachBallToPaddle();
 
-        ballDX = BALL_SPEED;
+        ballDX = 0;
         ballDY = -BALL_SPEED;
 
         secondBall = new Rectangle(0, 0, BALL_SIZE, BALL_SIZE);
-        secondBallDX = -BALL_SPEED;
+        secondBallDX = 0;
         secondBallDY = -BALL_SPEED;
 
         initializeBricks();
@@ -95,12 +95,12 @@ public class BreakoutModel {
 
         attachBallToPaddle();
 
-        ballDX = BALL_SPEED;
+        ballDX = 0;
         ballDY = -BALL_SPEED;
 
         if (secondBallActive) {
             attachSecondBallToPaddle();
-            secondBallDX = -BALL_SPEED;
+            secondBallDX = 0;
             secondBallDY = -BALL_SPEED;
         }
 
@@ -180,7 +180,7 @@ public class BreakoutModel {
             secondBall.x = ball.x + 20;
             secondBall.y = ball.y + 20;
 
-            secondBallDX = -BALL_SPEED;
+            secondBallDX = 0;
             secondBallDY = -BALL_SPEED;
         }
     }

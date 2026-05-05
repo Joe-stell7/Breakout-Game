@@ -84,16 +84,45 @@ public class BreakoutController implements KeyListener, ActionListener {
         currentBall.x += dx;
         currentBall.y += dy;
 
-        if (currentBall.x <= 0 || currentBall.x + currentBall.width >= BreakoutModel.WINDOW_WIDTH) {
-            dx = -dx;
+        if (currentBall.x <= 0) {
+            currentBall.x = 0;
+            dx = Math.abs(dx);
+        } else if (currentBall.x + currentBall.width >= BreakoutModel.WINDOW_WIDTH) {
+            currentBall.x = BreakoutModel.WINDOW_WIDTH - currentBall.width;
+            dx = -Math.abs(dx);
         }
 
         if (currentBall.y <= BreakoutModel.TOP_HUD_HEIGHT) {
-            dy = -dy;
+            currentBall.y = BreakoutModel.TOP_HUD_HEIGHT;
+            dy = Math.abs(dy);
         }
 
-        if (currentBall.intersects(model.getPaddle())) {
-            dy = -Math.abs(dy);
+        if (currentBall.intersects(model.getPaddle()) && dy > 0) {
+            Rectangle paddle = model.getPaddle();
+            currentBall.y = paddle.y - currentBall.height;
+
+            int paddleCenter = paddle.x + paddle.width / 2;
+            int ballCenter = currentBall.x + currentBall.width / 2;
+            double relativeIntersect = (double) (ballCenter - paddleCenter) / (paddle.width / 2.0);
+
+            if (relativeIntersect < -1.0) {
+                relativeIntersect = -1.0;
+            }
+            if (relativeIntersect > 1.0) {
+                relativeIntersect = 1.0;
+            }
+
+            dx = (int) Math.round(relativeIntersect * BreakoutModel.BALL_SPEED * 2);
+
+            if (dx == 0) {
+                dx = 1;
+            }
+
+            dy = -BreakoutModel.BALL_SPEED;
+
+            if (Math.abs(dx) >= Math.abs(dy)) {
+                dy = -Math.abs(dx) - 1;
+            }
         }
 
         BreakoutModel.Brick[][] bricks = model.getBricks();
@@ -106,6 +135,13 @@ public class BreakoutController implements KeyListener, ActionListener {
                 if (!brick.destroyed && currentBall.intersects(brick.bounds)) {
                     brick.destroyed = true;
                     model.addScore(brick.pointValue);
+
+                    if (dy > 0) {
+                        currentBall.y = brick.bounds.y - currentBall.height;
+                    } else {
+                        currentBall.y = brick.bounds.y + brick.bounds.height;
+                    }
+
                     dy = -dy;
                     brickHit = true;
                 }
@@ -113,7 +149,7 @@ public class BreakoutController implements KeyListener, ActionListener {
         }
 
         if (currentBall.y > BreakoutModel.WINDOW_HEIGHT) {
-            if (firstBall || !model.isSecondBallActive()) {
+            if (firstBall) {
                 model.loseLife();
 
                 if (model.getLives() <= 0) {
