@@ -1,150 +1,149 @@
+import javax.swing.JFrame;
+import javax.swing.Timer;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import javax.swing.Timer;
+import java.awt.event.KeyListener;
 
-public class BreakoutController extends KeyAdapter implements ActionListener {
+public class BreakoutController implements KeyListener, ActionListener {
     private BreakoutModel model;
     private BreakoutView view;
+    private JFrame frame;
     private Timer timer;
 
-    private boolean movingLeft;
-    private boolean movingRight;
+    private boolean leftPressed;
+    private boolean rightPressed;
 
-    public BreakoutController(BreakoutModel model, BreakoutView view) {
-        this.model = model;
-        this.view = view;
+    public BreakoutController() {
+        model = new BreakoutModel();
+        view = new BreakoutView(model);
 
-        view.addKeyListener(this);
+        frame = new JFrame("Breakout");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setSize(BreakoutModel.WINDOW_WIDTH, BreakoutModel.WINDOW_HEIGHT);
+        frame.add(view);
+        frame.addKeyListener(this);
+        frame.setResizable(false);
+        frame.setVisible(true);
 
         timer = new Timer(16, this);
-    }
-
-    public void startGameLoop() {
         timer.start();
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        updateGame();
+        if (model.getGameState() == BreakoutModel.GameState.PLAYING) {
+            updatePaddle();
+            updateBall(model.getBall(), true);
+
+            if (model.isSecondBallActive()) {
+                updateBall(model.getSecondBall(), false);
+            }
+
+            checkWin();
+        } else if (model.getGameState() == BreakoutModel.GameState.WAITING) {
+            updatePaddle();
+            model.attachBallToPaddle();
+
+            if (model.isSecondBallActive()) {
+                model.attachSecondBallToPaddle();
+            }
+        }
+
         view.repaint();
     }
 
-    private void updateGame() {
-        movePaddle();
-
-        if (model.getGameState() == BreakoutModel.GameState.WAITING) {
-            model.attachBallToPaddle();
-            return;
-        }
-
-        if (model.getGameState() != BreakoutModel.GameState.PLAYING) {
-            return;
-        }
-
-        moveBall();
-        checkWallCollisions();
-        checkPaddleCollision();
-        checkBrickCollisions();
-        checkWinOrLoss();
-    }
-
-    private void movePaddle() {
-        if (movingLeft) {
+    private void updatePaddle() {
+        if (leftPressed) {
             model.getPaddle().x -= BreakoutModel.PADDLE_SPEED;
         }
-        if (movingRight) {
+        if (rightPressed) {
             model.getPaddle().x += BreakoutModel.PADDLE_SPEED;
         }
 
         if (model.getPaddle().x < 0) {
             model.getPaddle().x = 0;
         }
-
         if (model.getPaddle().x + model.getPaddle().width > BreakoutModel.WINDOW_WIDTH) {
             model.getPaddle().x = BreakoutModel.WINDOW_WIDTH - model.getPaddle().width;
         }
     }
 
-    private void moveBall() {
-        model.getBall().x += model.getBallDX();
-        model.getBall().y += model.getBallDY();
-    }
+    private void updateBall(java.awt.Rectangle currentBall, boolean firstBall) {
+        int dx = firstBall ? model.getBallDX() : model.getSecondBallDX();
+        int dy = firstBall ? model.getBallDY() : model.getSecondBallDY();
 
-    private void checkWallCollisions() {
-        if (model.getBall().x <= 0 || model.getBall().x + model.getBall().width >= BreakoutModel.WINDOW_WIDTH) {
-            model.setBallDX(-model.getBallDX());
+        currentBall.x += dx;
+        currentBall.y += dy;
+
+        if (currentBall.x <= 0 || currentBall.x + currentBall.width >= BreakoutModel.WINDOW_WIDTH) {
+            dx = -dx;
         }
 
-        if (model.getBall().y <= BreakoutModel.TOP_HUD_HEIGHT) {
-            model.setBallDY(-model.getBallDY());
+        if (currentBall.y <= BreakoutModel.TOP_HUD_HEIGHT) {
+            dy = -dy;
         }
 
-        if (model.getBall().y > BreakoutModel.WINDOW_HEIGHT) {
-            model.loseLife();
+        if (currentBall.intersects(model.getPaddle())) {
+            dy = -Math.abs(dy);
+        }
 
-            if (model.getLives() <= 0) {
-                model.setGameState(BreakoutModel.GameState.LOST);
-            } else {
-                model.resetAfterLifeLost();
+        BreakoutModel.Brick[][] bricks = model.getBricks();
+        boolean brickHit = false;
+
+        for (int row = 0; row < BreakoutModel.BRICK_ROWS && !brickHit; row++) {
+            for (int col = 0; col < BreakoutModel.BRICK_COLS && !brickHit; col++) {
+                BreakoutModel.Brick brick = bricks[row][col];
+
+                if (!brick.destroyed && currentBall.intersects(brick.bounds)) {
+                    brick.destroyed = true;
+                    model.addScore(brick.pointValue);
+                    dy = -dy;
+                    brickHit = true;
+                }
             }
         }
-    }
 
-    private void checkPaddleCollision() {
-        if (model.getBall().intersects(model.getPaddle())) {
-            int paddleLeft = model.getPaddle().x;
-            int paddleWidth = model.getPaddle().width;
-            int ballCenter = model.getBall().x + model.getBall().width / 2;
+        if (currentBall.y > BreakoutModel.WINDOW_HEIGHT) {
+            if (firstBall || !model.isSecondBallActive()) {
+                model.loseLife();
 
-            int relativeHit = ballCenter - paddleLeft;
-
-            if (relativeHit < paddleWidth / 3) {
-                model.setBallDX(-Math.abs(BreakoutModel.BALL_SPEED));
-            } else if (relativeHit < 2 * paddleWidth / 3) {
-                model.setBallDX(0);
+                if (model.getLives() <= 0) {
+                    model.setGameState(BreakoutModel.GameState.LOST);
+                } else {
+                    model.resetAfterLifeLost();
+                }
+                return;
             } else {
-                model.setBallDX(Math.abs(BreakoutModel.BALL_SPEED));
+                currentBall.x = -100;
+                currentBall.y = -100;
+                model.setSecondBallDX(0);
+                model.setSecondBallDY(0);
+                return;
             }
+        }
 
-            model.setBallDY(-Math.abs(BreakoutModel.BALL_SPEED));
-            model.getBall().y = model.getPaddle().y - model.getBall().height;
+        if (firstBall) {
+            model.setBallDX(dx);
+            model.setBallDY(dy);
+        } else {
+            model.setSecondBallDX(dx);
+            model.setSecondBallDY(dy);
         }
     }
 
-    private void checkBrickCollisions() {
+    private void checkWin() {
         BreakoutModel.Brick[][] bricks = model.getBricks();
 
         for (int row = 0; row < BreakoutModel.BRICK_ROWS; row++) {
             for (int col = 0; col < BreakoutModel.BRICK_COLS; col++) {
-                BreakoutModel.Brick brick = bricks[row][col];
-
-                if (!brick.destroyed && model.getBall().intersects(brick.bounds)) {
-                    brick.destroyed = true;
-                    model.addScore(brick.pointValue);
-                    model.setBallDY(-model.getBallDY());
+                if (!bricks[row][col].destroyed) {
                     return;
                 }
             }
         }
-    }
 
-    private void checkWinOrLoss() {
-        boolean allDestroyed = true;
-
-        for (int row = 0; row < BreakoutModel.BRICK_ROWS; row++) {
-            for (int col = 0; col < BreakoutModel.BRICK_COLS; col++) {
-                if (!model.getBricks()[row][col].destroyed) {
-                    allDestroyed = false;
-                    break;
-                }
-            }
-        }
-
-        if (allDestroyed) {
-            model.setGameState(BreakoutModel.GameState.WON);
-        }
+        model.setGameState(BreakoutModel.GameState.WON);
     }
 
     @Override
@@ -152,14 +151,17 @@ public class BreakoutController extends KeyAdapter implements ActionListener {
         int key = e.getKeyCode();
 
         if (key == KeyEvent.VK_A) {
-            movingLeft = true;
-        } else if (key == KeyEvent.VK_D) {
-            movingRight = true;
-        } else if (key == KeyEvent.VK_SPACE) {
-            if (model.getGameState() == BreakoutModel.GameState.WAITING) {
-                model.setGameState(BreakoutModel.GameState.PLAYING);
-            }
-        } else if (key == KeyEvent.VK_R) {
+            leftPressed = true;
+        }
+        if (key == KeyEvent.VK_D) {
+            rightPressed = true;
+        }
+
+        if (key == KeyEvent.VK_SPACE && model.getGameState() == BreakoutModel.GameState.WAITING) {
+            model.setGameState(BreakoutModel.GameState.PLAYING);
+        }
+
+        if (key == KeyEvent.VK_R) {
             model.resetGame();
         }
     }
@@ -169,9 +171,14 @@ public class BreakoutController extends KeyAdapter implements ActionListener {
         int key = e.getKeyCode();
 
         if (key == KeyEvent.VK_A) {
-            movingLeft = false;
-        } else if (key == KeyEvent.VK_D) {
-            movingRight = false;
+            leftPressed = false;
         }
+        if (key == KeyEvent.VK_D) {
+            rightPressed = false;
+        }
+    }
+
+    @Override
+    public void keyTyped(KeyEvent e) {
     }
 }
