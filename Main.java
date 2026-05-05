@@ -19,5 +19,5 @@ public class Main {
             view.requestFocusInWindow();
             controller.startGameLoop();
         });
-    }
+    }   
 }

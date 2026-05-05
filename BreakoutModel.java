@@ -16,7 +16,7 @@ public class BreakoutModel {
 
     public static final int BRICK_ROWS = 8;
     public static final int BRICK_COLS = 8;
-    public static final int BRICK_WIDTH = 85;
+    public static final int BRICK_WIDTH = 95;
     public static final int BRICK_HEIGHT = 20;
     public static final int BRICK_GAP = 5;
 
@@ -96,7 +96,7 @@ public class BreakoutModel {
     public void initializeBricks() {
         bricks = new Brick[BRICK_ROWS][BRICK_COLS];
 
-        int startX = 40;
+        int startX = 0;
         int startY = TOP_HUD_HEIGHT + 20;
 
         for (int row = 0; row < BRICK_ROWS; row++) {
