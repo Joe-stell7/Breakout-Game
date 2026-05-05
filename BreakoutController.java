@@ -1,5 +1,6 @@
 import javax.swing.JFrame;
 import javax.swing.Timer;
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -22,9 +23,14 @@ public class BreakoutController implements KeyListener, ActionListener {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(BreakoutModel.WINDOW_WIDTH, BreakoutModel.WINDOW_HEIGHT);
         frame.add(view);
-        frame.addKeyListener(this);
         frame.setResizable(false);
+
+        view.addKeyListener(this);
+        view.setFocusable(true);
+
+        frame.setLocationRelativeTo(null);
         frame.setVisible(true);
+        view.requestFocusInWindow();
 
         timer = new Timer(16, this);
         timer.start();
@@ -54,22 +60,24 @@ public class BreakoutController implements KeyListener, ActionListener {
     }
 
     private void updatePaddle() {
+        Rectangle paddle = model.getPaddle();
+
         if (leftPressed) {
-            model.getPaddle().x -= BreakoutModel.PADDLE_SPEED;
+            paddle.x -= BreakoutModel.PADDLE_SPEED;
         }
         if (rightPressed) {
-            model.getPaddle().x += BreakoutModel.PADDLE_SPEED;
+            paddle.x += BreakoutModel.PADDLE_SPEED;
         }
 
-        if (model.getPaddle().x < 0) {
-            model.getPaddle().x = 0;
+        if (paddle.x < 0) {
+            paddle.x = 0;
         }
-        if (model.getPaddle().x + model.getPaddle().width > BreakoutModel.WINDOW_WIDTH) {
-            model.getPaddle().x = BreakoutModel.WINDOW_WIDTH - model.getPaddle().width;
+        if (paddle.x + paddle.width > BreakoutModel.WINDOW_WIDTH) {
+            paddle.x = BreakoutModel.WINDOW_WIDTH - paddle.width;
         }
     }
 
-    private void updateBall(java.awt.Rectangle currentBall, boolean firstBall) {
+    private void updateBall(Rectangle currentBall, boolean firstBall) {
         int dx = firstBall ? model.getBallDX() : model.getSecondBallDX();
         int dy = firstBall ? model.getBallDY() : model.getSecondBallDY();
 
