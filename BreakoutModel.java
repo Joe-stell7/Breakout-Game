@@ -39,9 +39,16 @@ public class BreakoutModel {
     }
 
     private Rectangle paddle;
+
     private Rectangle ball;
     private int ballDX;
     private int ballDY;
+
+    private Rectangle secondBall;
+    private int secondBallDX;
+    private int secondBallDY;
+    private boolean secondBallActive;
+    private boolean levelTwoUnlocked;
 
     private Brick[][] bricks;
 
@@ -59,6 +66,8 @@ public class BreakoutModel {
         lives = 3;
         score = 0;
         gameState = GameState.WAITING;
+        levelTwoUnlocked = false;
+        secondBallActive = false;
 
         paddle = new Rectangle(
                 (WINDOW_WIDTH - PADDLE_WIDTH) / 2,
@@ -73,6 +82,10 @@ public class BreakoutModel {
         ballDX = BALL_SPEED;
         ballDY = -BALL_SPEED;
 
+        secondBall = new Rectangle(0, 0, BALL_SIZE, BALL_SIZE);
+        secondBallDX = -BALL_SPEED;
+        secondBallDY = -BALL_SPEED;
+
         initializeBricks();
     }
 
@@ -85,12 +98,23 @@ public class BreakoutModel {
         ballDX = BALL_SPEED;
         ballDY = -BALL_SPEED;
 
+        if (secondBallActive) {
+            attachSecondBallToPaddle();
+            secondBallDX = -BALL_SPEED;
+            secondBallDY = -BALL_SPEED;
+        }
+
         gameState = GameState.WAITING;
     }
 
     public void attachBallToPaddle() {
         ball.x = paddle.x + (paddle.width / 2) - (BALL_SIZE / 2);
         ball.y = paddle.y - BALL_SIZE;
+    }
+
+    public void attachSecondBallToPaddle() {
+        secondBall.x = paddle.x + (paddle.width / 2) - (BALL_SIZE / 2) + 30;
+        secondBall.y = paddle.y - BALL_SIZE - 20;
     }
 
     public void initializeBricks() {
@@ -146,12 +170,39 @@ public class BreakoutModel {
         }
     }
 
+    public void unlockLevelTwoMultiBall() {
+        if (!levelTwoUnlocked && score >= 100) {
+            levelTwoUnlocked = true;
+            secondBallActive = true;
+
+            secondBall.width = BALL_SIZE;
+            secondBall.height = BALL_SIZE;
+            secondBall.x = ball.x + 20;
+            secondBall.y = ball.y + 20;
+
+            secondBallDX = -BALL_SPEED;
+            secondBallDY = -BALL_SPEED;
+        }
+    }
+
     public Rectangle getPaddle() {
         return paddle;
     }
 
     public Rectangle getBall() {
         return ball;
+    }
+
+    public Rectangle getSecondBall() {
+        return secondBall;
+    }
+
+    public boolean isSecondBallActive() {
+        return secondBallActive;
+    }
+
+    public boolean isLevelTwoUnlocked() {
+        return levelTwoUnlocked;
     }
 
     public Brick[][] getBricks() {
@@ -174,6 +225,22 @@ public class BreakoutModel {
         this.ballDY = ballDY;
     }
 
+    public int getSecondBallDX() {
+        return secondBallDX;
+    }
+
+    public int getSecondBallDY() {
+        return secondBallDY;
+    }
+
+    public void setSecondBallDX(int secondBallDX) {
+        this.secondBallDX = secondBallDX;
+    }
+
+    public void setSecondBallDY(int secondBallDY) {
+        this.secondBallDY = secondBallDY;
+    }
+
     public int getLives() {
         return lives;
     }
@@ -191,6 +258,8 @@ public class BreakoutModel {
         if (score > highScore) {
             highScore = score;
         }
+
+        unlockLevelTwoMultiBall();
     }
 
     public int getHighScore() {
