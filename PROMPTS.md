@@ -120,7 +120,20 @@ I wanted a more noticeable gameplay change, so I used score-based level progress
 What was added:
 This change added a second level and a multi-ball feature, so once the score reached 100 the game became faster and more diffuclt when there was level progression by putting two balls in play at the same time.
 
-Prompt 7- 
+Prompt 7 — Title screen, pause, and clean restart cycle
+
+Prompt:
+In my Java Swing Breakout game, add a polished game-state flow using my existing MVC structure. Update the code so the game starts on a title screen that shows the name BREAKOUT and the text "Press SPACE to start". Add a pause feature so pressing P pauses the game and pressing P again resumes it. Also add a clean restart cycle so pressing R fully resets the game with no leftover state.
+
+What the AI should produce
+It should return updated versions of the files that need state-flow changes, mainly BreakoutModel.java, BreakoutView.java, and BreakoutController.java. The update should introduce TITLE and PAUSED into the game state system, display a centered title screen message in the view, and handle SPACE, P, and R correctly in the controller.
+
+What I changed and why
+I wanted the game to feel more polished and complete instead of starting immediately in a gameplay-ready state. Adding a title screen, a pause toggle, and a clean restart flow makes the game feel more like a finished arcade game and also keeps the state transitions cleaner inside the MVC setup.
+
+What was added
+This change added a proper title screen, pause and resume controls, and a full restart cycle that resets the game cleanly back to the title screen. It also improved the game-state structure by separating title, waiting, playing, paused, win, and lose states more clearly.
+
 
 
 
