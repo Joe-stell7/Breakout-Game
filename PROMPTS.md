@@ -164,3 +164,14 @@ This change added a SoundManager.java file and connected three WAV files from th
 
 Prompt 10- A test-extension prompt for ModelTester
 
+Prompt:
+In ModelTester.java, add three new test methods for important BreakoutModel behavior without changing the existing tests. Use the same check(name, condition) helper. Add tests that verify losing the last active ball decrements lives, reaching the score threshold unlocks the next level or multiball behavior, and resetting the game restores the starting values for score, lives, and game state. Show me the full updated ModelTester.java file so I can paste it in.
+
+What the AI produced:
+It added three new test methods to ModelTester.java that checked life loss, score-based level or multiball progression, and reset behavior using the same simple check() pattern as the rest of the tester.
+
+What I changed and why:
+I wanted a simple way to test important model rules without needing to launch the whole Swing game every time. Adding these tests made it easier to verify that the core game logic was working correctly after the new features were added.
+
+What was added:
+This change added three new tests to ModelTester.java for losing a life, unlocking level progression or multiball from score thresholds, and resetting the game back to its starting values. The tester now checks more of the important BreakoutModel behavior directly from the console.

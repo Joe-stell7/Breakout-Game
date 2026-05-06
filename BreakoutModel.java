@@ -1,5 +1,9 @@
 import java.awt.Color;
 import java.awt.Rectangle;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public class BreakoutModel {
     public static final int WINDOW_WIDTH = 800;
@@ -19,6 +23,8 @@ public class BreakoutModel {
     public static final int BRICK_WIDTH = 95;
     public static final int BRICK_HEIGHT = 20;
     public static final int BRICK_GAP = 5;
+
+    private static final String HIGH_SCORE_FILE = "highscore.txt";
 
     public enum GameState {
         TITLE, WAITING, PLAYING, PAUSED, WON, LOST
@@ -69,6 +75,7 @@ public class BreakoutModel {
     private GameState gameState;
 
     public BreakoutModel() {
+        highScore = loadHighScore();
         resetGame();
     }
 
@@ -209,6 +216,29 @@ public class BreakoutModel {
         }
     }
 
+    private int[] normalizeVelocityToSpeed(int dx, int dy, int targetSpeed) {
+        if (dx == 0 && dy == 0) {
+            return new int[]{0, -targetSpeed};
+        }
+
+        double length = Math.sqrt(dx * dx + dy * dy);
+        if (length == 0) {
+            return new int[]{0, -targetSpeed};
+        }
+
+        int newDX = (int) Math.round((dx / length) * targetSpeed);
+        int newDY = (int) Math.round((dy / length) * targetSpeed);
+
+        if (newDX == 0 && dx != 0) {
+            newDX = dx > 0 ? 1 : -1;
+        }
+        if (newDY == 0 && dy != 0) {
+            newDY = dy > 0 ? 1 : -1;
+        }
+
+        return new int[]{newDX, newDY};
+    }
+
     public void unlockLevelTwoMultiBall() {
         if (!levelTwoUnlocked && score >= 50) {
             levelTwoUnlocked = true;
@@ -219,8 +249,9 @@ public class BreakoutModel {
             secondBall.x = ball.x + 20;
             secondBall.y = ball.y + 20;
 
-            secondBallDX = currentBallSpeed;
-            secondBallDY = -currentBallSpeed;
+            int[] velocity = normalizeVelocityToSpeed(1, -1, currentBallSpeed);
+            secondBallDX = velocity[0];
+            secondBallDY = velocity[1];
         }
     }
 
@@ -234,8 +265,39 @@ public class BreakoutModel {
             thirdBall.x = ball.x - 20;
             thirdBall.y = ball.y + 20;
 
-            thirdBallDX = -currentBallSpeed;
-            thirdBallDY = -currentBallSpeed;
+            int[] velocity = normalizeVelocityToSpeed(-1, -1, currentBallSpeed);
+            thirdBallDX = velocity[0];
+            thirdBallDY = velocity[1];
+        }
+    }
+
+    private int loadHighScore() {
+        Path path = Paths.get(HIGH_SCORE_FILE);
+
+        try {
+            if (!Files.exists(path)) {
+                Files.writeString(path, "0");
+                return 0;
+            }
+
+            String text = Files.readString(path).trim();
+            if (text.isEmpty()) {
+                return 0;
+            }
+
+            return Integer.parseInt(text);
+        } catch (IOException | NumberFormatException e) {
+            return 0;
+        }
+    }
+
+    private void saveHighScore() {
+        Path path = Paths.get(HIGH_SCORE_FILE);
+
+        try {
+            Files.writeString(path, String.valueOf(highScore));
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
@@ -347,6 +409,7 @@ public class BreakoutModel {
         score += points;
         if (score > highScore) {
             highScore = score;
+            saveHighScore();
         }
 
         updateLevelAndSpeeds();
