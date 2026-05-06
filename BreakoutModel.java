@@ -56,6 +56,10 @@ public class BreakoutModel {
     private int score;
     private int highScore;
 
+    private int currentLevel;
+    private int currentBallSpeed;
+    private int currentPaddleSpeed;
+
     private GameState gameState;
 
     public BreakoutModel() {
@@ -67,6 +71,9 @@ public class BreakoutModel {
         score = 0;
         levelTwoUnlocked = false;
         secondBallActive = false;
+        currentLevel = 1;
+        currentBallSpeed = BALL_SPEED;
+        currentPaddleSpeed = PADDLE_SPEED;
         gameState = GameState.TITLE;
 
         paddle = new Rectangle(
@@ -80,7 +87,7 @@ public class BreakoutModel {
         attachBallToPaddle();
 
         ballDX = 0;
-        ballDY = -BALL_SPEED;
+        ballDY = -currentBallSpeed;
 
         secondBall = new Rectangle(-100, -100, BALL_SIZE, BALL_SIZE);
         secondBallDX = 0;
@@ -95,7 +102,7 @@ public class BreakoutModel {
 
         attachBallToPaddle();
         ballDX = 0;
-        ballDY = -BALL_SPEED;
+        ballDY = -currentBallSpeed;
 
         secondBallActive = false;
         secondBall.x = -100;
@@ -168,8 +175,24 @@ public class BreakoutModel {
         }
     }
 
+    public void updateLevelAndSpeeds() {
+        if (score >= 150) {
+            currentLevel = 3;
+            currentBallSpeed = 6;
+            currentPaddleSpeed = 10;
+        } else if (score >= 50) {
+            currentLevel = 2;
+            currentBallSpeed = 4;
+            currentPaddleSpeed = 8;
+        } else {
+            currentLevel = 1;
+            currentBallSpeed = 4;
+            currentPaddleSpeed = 8;
+        }
+    }
+
     public void unlockLevelTwoMultiBall() {
-        if (!levelTwoUnlocked && score >= 100) {
+        if (!levelTwoUnlocked && score >= 50) {
             levelTwoUnlocked = true;
             secondBallActive = true;
 
@@ -178,8 +201,8 @@ public class BreakoutModel {
             secondBall.x = ball.x + 20;
             secondBall.y = ball.y + 20;
 
-            secondBallDX = BALL_SPEED;
-            secondBallDY = -BALL_SPEED;
+            secondBallDX = currentBallSpeed;
+            secondBallDY = -currentBallSpeed;
         }
     }
 
@@ -261,11 +284,24 @@ public class BreakoutModel {
             highScore = score;
         }
 
+        updateLevelAndSpeeds();
         unlockLevelTwoMultiBall();
     }
 
     public int getHighScore() {
         return highScore;
+    }
+
+    public int getCurrentLevel() {
+        return currentLevel;
+    }
+
+    public int getCurrentBallSpeed() {
+        return currentBallSpeed;
+    }
+
+    public int getCurrentPaddleSpeed() {
+        return currentPaddleSpeed;
     }
 
     public GameState getGameState() {

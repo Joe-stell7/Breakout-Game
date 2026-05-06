@@ -59,10 +59,10 @@ public class BreakoutController implements KeyListener, ActionListener {
         Rectangle paddle = model.getPaddle();
 
         if (leftPressed) {
-            paddle.x -= BreakoutModel.PADDLE_SPEED;
+            paddle.x -= model.getCurrentPaddleSpeed();
         }
         if (rightPressed) {
-            paddle.x += BreakoutModel.PADDLE_SPEED;
+            paddle.x += model.getCurrentPaddleSpeed();
         }
 
         if (paddle.x < 0) {
@@ -70,6 +70,51 @@ public class BreakoutController implements KeyListener, ActionListener {
         }
         if (paddle.x + paddle.width > BreakoutModel.WINDOW_WIDTH) {
             paddle.x = BreakoutModel.WINDOW_WIDTH - paddle.width;
+        }
+    }
+
+    private int[] normalizeVelocityToSpeed(int dx, int dy, int targetSpeed) {
+        if (dx == 0 && dy == 0) {
+            return new int[]{0, -targetSpeed};
+        }
+
+        double length = Math.sqrt(dx * dx + dy * dy);
+        if (length == 0) {
+            return new int[]{0, -targetSpeed};
+        }
+
+        int newDX = (int) Math.round((dx / length) * targetSpeed);
+        int newDY = (int) Math.round((dy / length) * targetSpeed);
+
+        if (newDX == 0 && dx != 0) {
+            newDX = dx > 0 ? 1 : -1;
+        }
+        if (newDY == 0 && dy != 0) {
+            newDY = dy > 0 ? 1 : -1;
+        }
+
+        return new int[]{newDX, newDY};
+    }
+
+    private void syncBallSpeedsToCurrentLevel() {
+        int targetSpeed = model.getCurrentBallSpeed();
+
+        int[] mainVelocity = normalizeVelocityToSpeed(
+                model.getBallDX(),
+                model.getBallDY(),
+                targetSpeed
+        );
+        model.setBallDX(mainVelocity[0]);
+        model.setBallDY(mainVelocity[1]);
+
+        if (model.isSecondBallActive()) {
+            int[] secondVelocity = normalizeVelocityToSpeed(
+                    model.getSecondBallDX(),
+                    model.getSecondBallDY(),
+                    targetSpeed
+            );
+            model.setSecondBallDX(secondVelocity[0]);
+            model.setSecondBallDY(secondVelocity[1]);
         }
     }
 
@@ -111,7 +156,7 @@ public class BreakoutController implements KeyListener, ActionListener {
                 relativeIntersect = 1.0;
             }
 
-            int speed = BreakoutModel.BALL_SPEED;
+            int speed = model.getCurrentBallSpeed();
 
             dx = (int) Math.round(relativeIntersect * speed);
 
@@ -131,7 +176,15 @@ public class BreakoutController implements KeyListener, ActionListener {
 
                 if (!brick.destroyed && currentBall.intersects(brick.bounds)) {
                     brick.destroyed = true;
+
+                    int previousLevel = model.getCurrentLevel();
                     model.addScore(brick.pointValue);
+
+                    if (model.getCurrentLevel() != previousLevel) {
+                        syncBallSpeedsToCurrentLevel();
+                        dx = firstBall ? model.getBallDX() : model.getSecondBallDX();
+                        dy = firstBall ? model.getBallDY() : model.getSecondBallDY();
+                    }
 
                     int overlapLeft = (currentBall.x + currentBall.width) - brick.bounds.x;
                     int overlapRight = (brick.bounds.x + brick.bounds.width) - currentBall.x;

@@ -32,13 +32,7 @@ public class BreakoutView extends JPanel {
         g.drawString("Score: " + model.getScore(), 20, 30);
         g.drawString("High Score: " + model.getHighScore(), 160, 30);
         g.drawString("Lives: " + model.getLives(), 360, 30);
-
-        if (model.isLevelTwoUnlocked()) {
-            g.drawString("Level: 2", 480, 30);
-        } else {
-            g.drawString("Level: 1", 480, 30);
-        }
-
+        g.drawString("Level: " + model.getCurrentLevel(), 480, 30);
         g.drawString("Space = Start", 580, 30);
         g.drawString("R = Restart", 580, 50);
         g.drawString("P = Pause", 580, 70);
