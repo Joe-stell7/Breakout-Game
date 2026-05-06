@@ -1,4 +1,4 @@
-Prompt 1 — Interview prompt
+Prompt 1 - Interview prompt
 Prompt: 
 I want to build a Breakout game in Java with Swing using MVC. Before we write any code, interview me. Ask me one question at a time about gameplay, controls, win and loss conditions, and what should be on the screen. After about 8 questions, summarize what I told you as a one-page spec organized by Model, View, and Controller.
 
@@ -10,16 +10,16 @@ What I changed and why:
 I answered the questions and clarified specific rules like lives, controls, scoring, and the brick layout so the game would be fully defined before coding.
 
 
-Prompt 2 — Spec dump prompt that started the initial build
+Prompt 2 - Spec dump prompt that started the initial build
 Prompt:
 I am building Breakout in Java with Swing using MVC. Here is my spec:
 
-Breakout — Spec
+Breakout - Spec
 
 Gameplay  
 A paddle hits a ball upward to break bricks. If the ball falls below the paddle, the player loses a life and the paddle and ball reset. The player has 3 lives total. The goal is to destroy all bricks to win. There is no start screen. The ball starts on the paddle, and the player presses Space to launch it.
 
-Model — BreakoutModel.java  
+Model - BreakoutModel.java  
 paddle x, y, width, height  
 ball x, y, xVelocity, yVelocity, size  
 lives (int, starts at 3)  
@@ -32,14 +32,14 @@ rows 1–2 red = 7 points, rows 3–4 orange = 5 points, rows 5–6 green = 3 po
 ball rests on paddle before launch  
 paddle hit changes ball direction: left goes left, middle goes straight up, right goes right
 
-View — BreakoutView.java  
+View - BreakoutView.java  
 draws paddle, ball, bricks, and boundaries  
 draws score, high score, and lives at the top  
 draws “Space = Launch” and “R = Restart”  
 draws “YOU WIN” when all bricks are destroyed  
 draws “GAME OVER” when all lives are lost
 
-Controller — BreakoutController.java  
+Controller - BreakoutController.java  
 A key moves paddle left  
 D key moves paddle right  
 Space launches ball  
@@ -60,7 +60,7 @@ What I changed and why:
 I kept the project as a 4-file MVC structure because that matched my assignment better than adding extra object classes.
 
 
-Prompt 3 — The scoped edit fixing wall collision
+Prompt 3 - The scoped edit fixing wall collision
 
 Prompt:  
 In BreakoutModel.java, update the brick layout values so the 8 x 8 brick grid stretches to the left and right boundary walls. Do not modify BreakoutView.java, BreakoutController.java, or Main.java. Show me only the changed lines — I will paste them in.
@@ -72,7 +72,7 @@ What I changed and why:
 I updated the brick width and starting x-position in BreakoutModel.java because that was the file actually creating the brick rectangles, so changing the model fixed both the drawn layout and the collision alignment.
 
 
-Prompt 4 — The debugging prompt with model error
+Prompt 4 - The debugging prompt with model error
 
 Prompt:  
 I ran my Breakout game and the brick layout still looked wrong after I updated BreakoutModel.java. The bricks were not reaching the side boundaries the way I expected.
@@ -91,7 +91,7 @@ What I changed and why:
 I updated the brick width and starting x-position again because the first layout still left unused space on the sides, and I needed the brick grid to span the play area more closely.
 
 
-Prompt 5 — Reflection on an AI answer that was incomplete
+Prompt 5 - Reflection on an AI answer that was incomplete
 
 Prompt:  
 Earlier, I used this prompt in BreakoutModel.java:
@@ -106,7 +106,7 @@ I ran the game, saw that the layout still had unused space on the sides, and rea
 What was wrong and how I corrected it:
 The AI’s first brick values were close but not exact, so the grid still left gaps on the sides. I corrected this by adjusting the brick dimensions and starting position in the model until the grid reached the boundaries, which fixed both the drawn layout and the collision alignment.
 
-Prompt 6 The refactor model — The model change for level two and multi-ball
+Prompt 6 - The refactor model - The model change for level two and multi-ball
 
 Prompt:
 In BreakoutModel.java, refactor the ball state so the model can support two balls at once instead of one. Add a method unlockLevelTwoMultiBall() that activates level two when the score reaches 100 and creates a second ball with its own position and direction. Do not modify BreakoutView.java, BreakoutController.java, or Main.java. Show me only the new and changed lines in BreakoutModel.java — I will paste them in.
@@ -120,7 +120,7 @@ I wanted a more noticeable gameplay change, so I used score-based level progress
 What was added:
 This change added a second level and a multi-ball feature, so once the score reached 100 the game became faster and more diffuclt when there was level progression by putting two balls in play at the same time.
 
-Prompt 7 — Title screen, pause, and clean restart cycle
+Prompt 7 - Title screen, pause, and clean restart cycle
 
 Prompt:
 In my Java Swing Breakout game, add a polished game-state flow using my existing MVC structure. Update the code so the game starts on a title screen that shows the name BREAKOUT and the text "Press SPACE to start". Add a pause feature so pressing P pauses the game and pressing P again resumes it. Also add a clean restart cycle so pressing R fully resets the game with no leftover state.
@@ -134,7 +134,17 @@ I wanted the game to feel more polished and complete instead of starting immedia
 What was added
 This change added a proper title screen, pause and resume controls, and a full restart cycle that resets the game cleanly back to the title screen. It also improved the game-state structure by separating title, waiting, playing, paused, win, and lose states more clearly.
 
+Prompt:
+In BreakoutModel.java and BreakoutController.java, update the level progression so level two starts when the score reaches 50 instead of 100, and add a level three that begins at score 150. Add model fields for current level, current ball speed, and current paddle speed so movement can scale by level instead of always using the fixed constants. Make both balls always use the same speed values so the second ball does not feel faster than the first one. At level three, increase both the ball speed and the paddle speed. Do not modify Main.java. Show me only the new and changed lines in BreakoutModel.java and BreakoutController.java — I will paste them in.
 
+What the AI produced:
+It returned updates that added score-based level tracking, moved level two to start at 50 points, added a third level at 150 points, and introduced current movement-speed variables for the ball and paddle. It also changed the controller so paddle movement and bounce calculations used the new current speed values instead of relying only on the fixed constants.
+
+What I changed and why:
+I wanted level progression to happen earlier so the game would feel more active before the player got too far into the round. I also wanted both balls to feel fair during multiball, because the second ball sometimes looked faster than the first one, and the paddle felt too slow once two balls were in play. Adding level-based speed values made the difficulty curve more noticeable and gave me a cleaner way to tune gameplay.
+
+What was added:
+This change moved level two to score 50, added a level three at score 150, and increased both ball speed and paddle speed at level three. It also made both balls use the same speed rules so multiball felt more consistent and the paddle could better keep up once the game became faster.
 
 
 
