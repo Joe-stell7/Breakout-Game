@@ -134,6 +134,7 @@ I wanted the game to feel more polished and complete instead of starting immedia
 What was added
 This change added a proper title screen, pause and resume controls, and a full restart cycle that resets the game cleanly back to the title screen. It also improved the game-state structure by separating title, waiting, playing, paused, win, and lose states more clearly.
 
+Prompt 8 - Level progression for speed 
 Prompt:
 In BreakoutModel.java and BreakoutController.java, update the level progression so level two starts when the score reaches 50 instead of 100, and add a level three that begins at score 150. Add model fields for current level, current ball speed, and current paddle speed so movement can scale by level instead of always using the fixed constants. Make both balls always use the same speed values so the second ball does not feel faster than the first one. At level three, increase both the ball speed and the paddle speed. Do not modify Main.java. Show me only the new and changed lines in BreakoutModel.java and BreakoutController.java — I will paste them in.
 
@@ -145,6 +146,9 @@ I wanted level progression to happen earlier so the game would feel more active 
 
 What was added:
 This change moved level two to score 50, added a level three at score 150, and increased both ball speed and paddle speed at level three. It also made both balls use the same speed rules so multiball felt more consistent and the paddle could better keep up once the game became faster.
+
+Prompt 9 - Sound Effects in Breakout game
+
 
 
 

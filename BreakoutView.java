@@ -65,8 +65,18 @@ public class BreakoutView extends JPanel {
             return;
         }
 
-        g.setColor(Color.WHITE);
+        g.setColor(getPaddleColor());
         g.fillRect(model.getPaddle().x, model.getPaddle().y, model.getPaddle().width, model.getPaddle().height);
+    }
+
+    private Color getPaddleColor() {
+        if (model.getCurrentLevel() == 1) {
+            return Color.WHITE;
+        } else if (model.getCurrentLevel() == 2) {
+            return Color.CYAN;
+        } else {
+            return Color.ORANGE;
+        }
     }
 
     private void drawBall(Graphics g) {
@@ -84,7 +94,7 @@ public class BreakoutView extends JPanel {
         }
 
         if (model.isSecondBallActive()) {
-            g.setColor(Color.CYAN);
+            g.setColor(Color.BLUE);
             g.fillOval(model.getSecondBall().x, model.getSecondBall().y,
                     model.getSecondBall().width, model.getSecondBall().height);
         }

@@ -133,8 +133,10 @@ public class BreakoutController implements KeyListener, ActionListener {
             dx = -Math.abs(dx);
         }
 
-        if (currentBall.y <= BreakoutModel.TOP_HUD_HEIGHT) {
-            currentBall.y = BreakoutModel.TOP_HUD_HEIGHT;
+        int topWall = BreakoutModel.TOP_HUD_HEIGHT + 20;
+
+        if (currentBall.y <= topWall) {
+            currentBall.y = topWall;
             dy = Math.abs(dy);
         }
 
