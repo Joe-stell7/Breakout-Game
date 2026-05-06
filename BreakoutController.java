@@ -11,6 +11,7 @@ public class BreakoutController implements KeyListener, ActionListener {
     private final BreakoutView view;
     private final JFrame frame;
     private final Timer timer;
+    private final SoundManager soundManager;
 
     private boolean leftPressed;
     private boolean rightPressed;
@@ -18,6 +19,7 @@ public class BreakoutController implements KeyListener, ActionListener {
     public BreakoutController() {
         model = new BreakoutModel();
         view = new BreakoutView(model);
+        soundManager = new SoundManager();
 
         frame = new JFrame("Breakout");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -203,6 +205,7 @@ public class BreakoutController implements KeyListener, ActionListener {
 
                 if (!brick.destroyed && currentBall.intersects(brick.bounds)) {
                     brick.destroyed = true;
+                    soundManager.playBrickSound();
 
                     int previousLevel = model.getCurrentLevel();
                     model.addScore(brick.pointValue);
@@ -302,9 +305,11 @@ public class BreakoutController implements KeyListener, ActionListener {
                 model.setThirdBallActive(false);
             } else {
                 model.loseLife();
+                soundManager.playLifeLostSound();
 
                 if (model.getLives() <= 0) {
                     model.setGameState(BreakoutModel.GameState.LOST);
+                    soundManager.playGameOverSound();
                 } else {
                     model.resetAfterLifeLost();
                 }

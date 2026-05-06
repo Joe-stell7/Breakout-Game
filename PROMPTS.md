@@ -149,7 +149,17 @@ This change moved level two to score 50, added a level three at score 150, and i
 
 Prompt 9 - Sound Effects in Breakout game
 
+Prompt:
+In BreakoutController.java, add sound effects for key game events without changing the gameplay rules. I already created a sounds folder inside my BreakoutGame project with these files: brick.wav, life_lost.wav, and game_over.wav. Add a new SoundManager.java file that can play short WAV files from that sounds folder. Play brick.wav whenever a brick is destroyed, play life_lost.wav whenever the player loses a life, and play game_over.wav when the player reaches 0 lives and the game ends. Keep the code simple and beginner-friendly, keep the MVC structure, and do not modify Main.java or BreakoutView.java unless absolutely necessary. Show me the full new SoundManager.java file and the full updated BreakoutController.java file so I can paste them in.
 
+What the AI produced:
+It added a small sound manager class for loading and playing short WAV sound effects and updated the controller so sounds trigger during brick breaks, life loss, and game over. The gameplay logic stayed the same, but the controller now gives audio feedback at the exact moments those events happen.
+
+What I changed and why:
+I wanted the game to feel more polished and more like an arcade game without changing how it plays. Adding sound to brick hits, life loss, and game over makes important events easier to notice and gives the game more feedback for the player.
+
+What was added:
+This change added a SoundManager.java file and connected three WAV files from the sounds folder to existing game events. The brick hit sound plays when a brick is destroyed, the life-lost sound plays when the last active ball is lost and a life is removed, and the game-over sound plays when the player runs out of lives.
 
 
 
