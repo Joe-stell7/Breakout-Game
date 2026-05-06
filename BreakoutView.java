@@ -41,9 +41,14 @@ public class BreakoutView extends JPanel {
 
         g.drawString("Space = Start", 580, 30);
         g.drawString("R = Restart", 580, 50);
+        g.drawString("P = Pause", 580, 70);
     }
 
     private void drawBricks(Graphics g) {
+        if (model.getGameState() == BreakoutModel.GameState.TITLE) {
+            return;
+        }
+
         BreakoutModel.Brick[][] bricks = model.getBricks();
 
         for (int row = 0; row < BreakoutModel.BRICK_ROWS; row++) {
@@ -62,16 +67,28 @@ public class BreakoutView extends JPanel {
     }
 
     private void drawPaddle(Graphics g) {
+        if (model.getGameState() == BreakoutModel.GameState.TITLE) {
+            return;
+        }
+
         g.setColor(Color.WHITE);
         g.fillRect(model.getPaddle().x, model.getPaddle().y, model.getPaddle().width, model.getPaddle().height);
     }
 
     private void drawBall(Graphics g) {
+        if (model.getGameState() == BreakoutModel.GameState.TITLE) {
+            return;
+        }
+
         g.setColor(Color.YELLOW);
         g.fillOval(model.getBall().x, model.getBall().y, model.getBall().width, model.getBall().height);
     }
 
     private void drawSecondBall(Graphics g) {
+        if (model.getGameState() == BreakoutModel.GameState.TITLE) {
+            return;
+        }
+
         if (model.isSecondBallActive()) {
             g.setColor(Color.CYAN);
             g.fillOval(model.getSecondBall().x, model.getSecondBall().y,
@@ -79,16 +96,29 @@ public class BreakoutView extends JPanel {
         }
     }
 
+    private void drawCenteredString(Graphics g, String text, int y, Font font) {
+        g.setFont(font);
+        int textWidth = g.getFontMetrics().stringWidth(text);
+        int x = (BreakoutModel.WINDOW_WIDTH - textWidth) / 2;
+        g.drawString(text, x, y);
+    }
+
     private void drawGameStateMessage(Graphics g) {
         g.setColor(Color.WHITE);
-        g.setFont(new Font("Arial", Font.BOLD, 28));
 
-        if (model.getGameState() == BreakoutModel.GameState.WAITING) {
-            g.drawString("Press Space to Launch", 250, 350);
+        if (model.getGameState() == BreakoutModel.GameState.TITLE) {
+            drawCenteredString(g, "BREAKOUT", 220, new Font("Arial", Font.BOLD, 42));
+            drawCenteredString(g, "Press SPACE to Start", 300, new Font("Arial", Font.BOLD, 28));
+            drawCenteredString(g, "A / D = Move   P = Pause   R = Restart", 360, new Font("Arial", Font.PLAIN, 20));
+        } else if (model.getGameState() == BreakoutModel.GameState.WAITING) {
+            drawCenteredString(g, "Press SPACE to Launch", 350, new Font("Arial", Font.BOLD, 28));
+        } else if (model.getGameState() == BreakoutModel.GameState.PAUSED) {
+            drawCenteredString(g, "PAUSED", 320, new Font("Arial", Font.BOLD, 32));
+            drawCenteredString(g, "Press P to Resume", 370, new Font("Arial", Font.BOLD, 24));
         } else if (model.getGameState() == BreakoutModel.GameState.WON) {
-            g.drawString("You Win! Press R to Restart", 220, 350);
+            drawCenteredString(g, "You Win! Press R to Restart", 350, new Font("Arial", Font.BOLD, 28));
         } else if (model.getGameState() == BreakoutModel.GameState.LOST) {
-            g.drawString("Game Over! Press R to Restart", 190, 350);
+            drawCenteredString(g, "Game Over! Press R to Restart", 350, new Font("Arial", Font.BOLD, 28));
         }
     }
 }

@@ -7,10 +7,10 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
 public class BreakoutController implements KeyListener, ActionListener {
-    private BreakoutModel model;
-    private BreakoutView view;
-    private JFrame frame;
-    private Timer timer;
+    private final BreakoutModel model;
+    private final BreakoutView view;
+    private final JFrame frame;
+    private final Timer timer;
 
     private boolean leftPressed;
     private boolean rightPressed;
@@ -237,12 +237,26 @@ public class BreakoutController implements KeyListener, ActionListener {
             rightPressed = true;
         }
 
-        if (key == KeyEvent.VK_SPACE && model.getGameState() == BreakoutModel.GameState.WAITING) {
-            model.setGameState(BreakoutModel.GameState.PLAYING);
+        if (key == KeyEvent.VK_SPACE) {
+            if (model.getGameState() == BreakoutModel.GameState.TITLE) {
+                model.startNewRound();
+            } else if (model.getGameState() == BreakoutModel.GameState.WAITING) {
+                model.setGameState(BreakoutModel.GameState.PLAYING);
+            }
+        }
+
+        if (key == KeyEvent.VK_P) {
+            if (model.getGameState() == BreakoutModel.GameState.PLAYING) {
+                model.setGameState(BreakoutModel.GameState.PAUSED);
+            } else if (model.getGameState() == BreakoutModel.GameState.PAUSED) {
+                model.setGameState(BreakoutModel.GameState.PLAYING);
+            }
         }
 
         if (key == KeyEvent.VK_R) {
             model.resetGame();
+            leftPressed = false;
+            rightPressed = false;
         }
     }
 

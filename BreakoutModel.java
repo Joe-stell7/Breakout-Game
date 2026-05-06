@@ -21,7 +21,7 @@ public class BreakoutModel {
     public static final int BRICK_GAP = 5;
 
     public enum GameState {
-        WAITING, PLAYING, WON, LOST
+        TITLE, WAITING, PLAYING, PAUSED, WON, LOST
     }
 
     public static class Brick {
@@ -65,9 +65,9 @@ public class BreakoutModel {
     public void resetGame() {
         lives = 3;
         score = 0;
-        gameState = GameState.WAITING;
         levelTwoUnlocked = false;
         secondBallActive = false;
+        gameState = GameState.TITLE;
 
         paddle = new Rectangle(
                 (WINDOW_WIDTH - PADDLE_WIDTH) / 2,
@@ -89,7 +89,7 @@ public class BreakoutModel {
         initializeBricks();
     }
 
-    public void resetAfterLifeLost() {
+    public void startNewRound() {
         paddle.x = (WINDOW_WIDTH - PADDLE_WIDTH) / 2;
         paddle.y = WINDOW_HEIGHT - 80;
 
@@ -104,6 +104,10 @@ public class BreakoutModel {
         secondBallDY = 0;
 
         gameState = GameState.WAITING;
+    }
+
+    public void resetAfterLifeLost() {
+        startNewRound();
     }
 
     public void attachBallToPaddle() {
