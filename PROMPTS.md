@@ -162,33 +162,5 @@ What was added:
 This change added a SoundManager.java file and connected three WAV files from the sounds folder to existing game events. The brick hit sound plays when a brick is destroyed, the life-lost sound plays when the last active ball is lost and a life is removed, and the game-over sound plays when the player runs out of lives.
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 Prompt 10- A test-extension prompt for ModelTester
+
