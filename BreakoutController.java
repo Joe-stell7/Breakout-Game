@@ -46,6 +46,10 @@ public class BreakoutController implements KeyListener, ActionListener {
                 updateBall(model.getSecondBall(), false);
             }
 
+            if (model.isThirdBallActive()) {
+                updateBall(model.getThirdBall(), false);
+            }
+
             checkWin();
         } else if (model.getGameState() == BreakoutModel.GameState.WAITING) {
             updatePaddle();
@@ -116,11 +120,32 @@ public class BreakoutController implements KeyListener, ActionListener {
             model.setSecondBallDX(secondVelocity[0]);
             model.setSecondBallDY(secondVelocity[1]);
         }
+
+        if (model.isThirdBallActive()) {
+            int[] thirdVelocity = normalizeVelocityToSpeed(
+                    model.getThirdBallDX(),
+                    model.getThirdBallDY(),
+                    targetSpeed
+            );
+            model.setThirdBallDX(thirdVelocity[0]);
+            model.setThirdBallDY(thirdVelocity[1]);
+        }
     }
 
     private void updateBall(Rectangle currentBall, boolean firstBall) {
-        int dx = firstBall ? model.getBallDX() : model.getSecondBallDX();
-        int dy = firstBall ? model.getBallDY() : model.getSecondBallDY();
+        int dx;
+        int dy;
+
+        if (firstBall) {
+            dx = model.getBallDX();
+            dy = model.getBallDY();
+        } else if (currentBall == model.getSecondBall()) {
+            dx = model.getSecondBallDX();
+            dy = model.getSecondBallDY();
+        } else {
+            dx = model.getThirdBallDX();
+            dy = model.getThirdBallDY();
+        }
 
         currentBall.x += dx;
         currentBall.y += dy;
@@ -184,8 +209,17 @@ public class BreakoutController implements KeyListener, ActionListener {
 
                     if (model.getCurrentLevel() != previousLevel) {
                         syncBallSpeedsToCurrentLevel();
-                        dx = firstBall ? model.getBallDX() : model.getSecondBallDX();
-                        dy = firstBall ? model.getBallDY() : model.getSecondBallDY();
+
+                        if (firstBall) {
+                            dx = model.getBallDX();
+                            dy = model.getBallDY();
+                        } else if (currentBall == model.getSecondBall()) {
+                            dx = model.getSecondBallDX();
+                            dy = model.getSecondBallDY();
+                        } else {
+                            dx = model.getThirdBallDX();
+                            dy = model.getThirdBallDY();
+                        }
                     }
 
                     int overlapLeft = (currentBall.x + currentBall.width) - brick.bounds.x;
@@ -220,20 +254,23 @@ public class BreakoutController implements KeyListener, ActionListener {
         }
 
         if (currentBall.y > BreakoutModel.WINDOW_HEIGHT) {
-            removeBall(firstBall);
+            removeBall(currentBall, firstBall);
             return;
         }
 
         if (firstBall) {
             model.setBallDX(dx);
             model.setBallDY(dy);
-        } else {
+        } else if (currentBall == model.getSecondBall()) {
             model.setSecondBallDX(dx);
             model.setSecondBallDY(dy);
+        } else {
+            model.setThirdBallDX(dx);
+            model.setThirdBallDY(dy);
         }
     }
 
-    private void removeBall(boolean firstBall) {
+    private void removeBall(Rectangle currentBall, boolean firstBall) {
         if (firstBall) {
             if (model.isSecondBallActive()) {
                 Rectangle mainBall = model.getBall();
@@ -249,6 +286,20 @@ public class BreakoutController implements KeyListener, ActionListener {
                 model.setSecondBallDX(0);
                 model.setSecondBallDY(0);
                 model.setSecondBallActive(false);
+            } else if (model.isThirdBallActive()) {
+                Rectangle mainBall = model.getBall();
+                Rectangle thirdBall = model.getThirdBall();
+
+                mainBall.x = thirdBall.x;
+                mainBall.y = thirdBall.y;
+                model.setBallDX(model.getThirdBallDX());
+                model.setBallDY(model.getThirdBallDY());
+
+                thirdBall.x = -100;
+                thirdBall.y = -100;
+                model.setThirdBallDX(0);
+                model.setThirdBallDY(0);
+                model.setThirdBallActive(false);
             } else {
                 model.loseLife();
 
@@ -258,12 +309,18 @@ public class BreakoutController implements KeyListener, ActionListener {
                     model.resetAfterLifeLost();
                 }
             }
-        } else {
+        } else if (currentBall == model.getSecondBall()) {
             model.getSecondBall().x = -100;
             model.getSecondBall().y = -100;
             model.setSecondBallDX(0);
             model.setSecondBallDY(0);
             model.setSecondBallActive(false);
+        } else if (currentBall == model.getThirdBall()) {
+            model.getThirdBall().x = -100;
+            model.getThirdBall().y = -100;
+            model.setThirdBallDX(0);
+            model.setThirdBallDY(0);
+            model.setThirdBallActive(false);
         }
     }
 

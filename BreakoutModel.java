@@ -50,6 +50,12 @@ public class BreakoutModel {
     private boolean secondBallActive;
     private boolean levelTwoUnlocked;
 
+    private Rectangle thirdBall;
+    private int thirdBallDX;
+    private int thirdBallDY;
+    private boolean thirdBallActive;
+    private boolean levelThreeUnlocked;
+
     private Brick[][] bricks;
 
     private int lives;
@@ -70,7 +76,9 @@ public class BreakoutModel {
         lives = 3;
         score = 0;
         levelTwoUnlocked = false;
+        levelThreeUnlocked = false;
         secondBallActive = false;
+        thirdBallActive = false;
         currentLevel = 1;
         currentBallSpeed = BALL_SPEED;
         currentPaddleSpeed = PADDLE_SPEED;
@@ -93,6 +101,10 @@ public class BreakoutModel {
         secondBallDX = 0;
         secondBallDY = 0;
 
+        thirdBall = new Rectangle(-100, -100, BALL_SIZE, BALL_SIZE);
+        thirdBallDX = 0;
+        thirdBallDY = 0;
+
         initializeBricks();
     }
 
@@ -109,6 +121,12 @@ public class BreakoutModel {
         secondBall.y = -100;
         secondBallDX = 0;
         secondBallDY = 0;
+
+        thirdBallActive = false;
+        thirdBall.x = -100;
+        thirdBall.y = -100;
+        thirdBallDX = 0;
+        thirdBallDY = 0;
 
         gameState = GameState.WAITING;
     }
@@ -179,11 +197,11 @@ public class BreakoutModel {
         if (score >= 150) {
             currentLevel = 3;
             currentBallSpeed = 6;
-            currentPaddleSpeed = 10;
+            currentPaddleSpeed = 12;
         } else if (score >= 50) {
             currentLevel = 2;
             currentBallSpeed = 4;
-            currentPaddleSpeed = 8;
+            currentPaddleSpeed = 10;
         } else {
             currentLevel = 1;
             currentBallSpeed = 4;
@@ -206,6 +224,21 @@ public class BreakoutModel {
         }
     }
 
+    public void unlockLevelThreeMultiBall() {
+        if (!levelThreeUnlocked && score >= 150) {
+            levelThreeUnlocked = true;
+            thirdBallActive = true;
+
+            thirdBall.width = BALL_SIZE;
+            thirdBall.height = BALL_SIZE;
+            thirdBall.x = ball.x - 20;
+            thirdBall.y = ball.y + 20;
+
+            thirdBallDX = -currentBallSpeed;
+            thirdBallDY = -currentBallSpeed;
+        }
+    }
+
     public Rectangle getPaddle() {
         return paddle;
     }
@@ -218,6 +251,10 @@ public class BreakoutModel {
         return secondBall;
     }
 
+    public Rectangle getThirdBall() {
+        return thirdBall;
+    }
+
     public boolean isSecondBallActive() {
         return secondBallActive;
     }
@@ -226,8 +263,20 @@ public class BreakoutModel {
         this.secondBallActive = secondBallActive;
     }
 
+    public boolean isThirdBallActive() {
+        return thirdBallActive;
+    }
+
+    public void setThirdBallActive(boolean thirdBallActive) {
+        this.thirdBallActive = thirdBallActive;
+    }
+
     public boolean isLevelTwoUnlocked() {
         return levelTwoUnlocked;
+    }
+
+    public boolean isLevelThreeUnlocked() {
+        return levelThreeUnlocked;
     }
 
     public Brick[][] getBricks() {
@@ -266,6 +315,22 @@ public class BreakoutModel {
         this.secondBallDY = secondBallDY;
     }
 
+    public int getThirdBallDX() {
+        return thirdBallDX;
+    }
+
+    public int getThirdBallDY() {
+        return thirdBallDY;
+    }
+
+    public void setThirdBallDX(int thirdBallDX) {
+        this.thirdBallDX = thirdBallDX;
+    }
+
+    public void setThirdBallDY(int thirdBallDY) {
+        this.thirdBallDY = thirdBallDY;
+    }
+
     public int getLives() {
         return lives;
     }
@@ -286,6 +351,7 @@ public class BreakoutModel {
 
         updateLevelAndSpeeds();
         unlockLevelTwoMultiBall();
+        unlockLevelThreeMultiBall();
     }
 
     public int getHighScore() {

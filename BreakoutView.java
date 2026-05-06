@@ -23,6 +23,7 @@ public class BreakoutView extends JPanel {
         drawPaddle(g);
         drawBall(g);
         drawSecondBall(g);
+        drawThirdBall(g);
         drawGameStateMessage(g);
     }
 
@@ -97,6 +98,18 @@ public class BreakoutView extends JPanel {
             g.setColor(Color.BLUE);
             g.fillOval(model.getSecondBall().x, model.getSecondBall().y,
                     model.getSecondBall().width, model.getSecondBall().height);
+        }
+    }
+
+    private void drawThirdBall(Graphics g) {
+        if (model.getGameState() == BreakoutModel.GameState.TITLE) {
+            return;
+        }
+
+        if (model.isThirdBallActive()) {
+            g.setColor(Color.MAGENTA);
+            g.fillOval(model.getThirdBall().x, model.getThirdBall().y,
+                    model.getThirdBall().width, model.getThirdBall().height);
         }
     }
 
